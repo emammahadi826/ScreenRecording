@@ -156,11 +156,18 @@ class SettingsWindow(Toplevel):
         self.geometry("380x420")
         self.configure(bg=CARD)
         self.transient(master)
+        self.attributes("-toolwindow", True) # Remove icon from title bar
 
         self.recorder = master.recorder
+        font_bold = ctk.CTkFont(weight="bold")
 
         # --- Header ---
-        ctk.CTkLabel(self, text="Settings", font=ctk.CTkFont(size=20, weight="bold")).pack(pady=15)
+        header = ctk.CTkFrame(self, fg_color="transparent")
+        header.pack(padx=20, pady=(14, 10), fill="x")
+        ctk.CTkLabel(header, text="Settings", font=ctk.CTkFont(size=20, weight="bold")).pack(side="left")
+        
+        close_btn = ctk.CTkButton(header, text="✕", width=40, command=self.destroy)
+        close_btn.pack(side="right")
 
         # --- Device Settings ---
         devices_frame = ctk.CTkFrame(self, fg_color=BG)
@@ -172,14 +179,14 @@ class SettingsWindow(Toplevel):
 
         self.audio_var = ctk.BooleanVar(value=mic_available)
         self.recorder.record_audio = mic_available
-        audio_switch = ctk.CTkSwitch(devices_frame, text="Record Microphone", variable=self.audio_var, command=self.toggle_audio)
+        audio_switch = ctk.CTkSwitch(devices_frame, text="Record Microphone", variable=self.audio_var, command=self.toggle_audio, font=font_bold)
         audio_switch.pack(anchor="w", padx=15, pady=10)
         if not mic_available:
             audio_switch.configure(state="disabled")
 
         self.webcam_var = ctk.BooleanVar(value=webcam_available)
         self.recorder.record_webcam = webcam_available
-        webcam_switch = ctk.CTkSwitch(devices_frame, text="Record Webcam", variable=self.webcam_var, command=self.toggle_webcam)
+        webcam_switch = ctk.CTkSwitch(devices_frame, text="Record Webcam", variable=self.webcam_var, command=self.toggle_webcam, font=font_bold)
         webcam_switch.pack(anchor="w", padx=15, pady=(0, 15))
         if not webcam_available:
             webcam_switch.configure(state="disabled")
@@ -190,13 +197,13 @@ class SettingsWindow(Toplevel):
         ctk.CTkLabel(recording_frame, text="Recording", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor="w", padx=15, pady=(10, 5))
 
         # Quality
-        ctk.CTkLabel(recording_frame, text="Video Quality").pack(anchor="w", padx=15, pady=(10,0))
+        ctk.CTkLabel(recording_frame, text="Video Quality", font=font_bold).pack(anchor="w", padx=15, pady=(10,0))
         self.quality_var = ctk.StringVar(value=self.recorder.quality)
         quality_menu = ctk.CTkOptionMenu(recording_frame, values=["Low", "Medium", "High"], variable=self.quality_var, command=self.set_quality)
         quality_menu.pack(anchor="w", padx=15, pady=(0,10), fill="x")
 
         # FPS
-        self.fps_label = ctk.CTkLabel(recording_frame, text=f"FPS: {self.recorder.fps}")
+        self.fps_label = ctk.CTkLabel(recording_frame, text=f"FPS: {self.recorder.fps}", font=font_bold)
         self.fps_label.pack(anchor="w", padx=15, pady=(10,0))
         self.fps_slider = ctk.CTkSlider(recording_frame, from_=5, to=30, command=self.set_fps)
         self.fps_slider.set(self.recorder.fps)
@@ -244,7 +251,7 @@ class RecorderApp(ctk.CTk):
         super().__init__()
         self.title("Pro Screen Recorder")
         self.geometry("480x320")
-        self.configure(fg_color=BG)
+        self.configure(fg_color=CARD)
 
         self.recorder = ScreenRecorder(fps=15)
         self.settings_window = None
@@ -258,7 +265,7 @@ class RecorderApp(ctk.CTk):
         self.settings_btn.pack(side="right")
 
         # --- Info Area ---
-        info_frame = ctk.CTkFrame(self, corner_radius=10, fg_color=CARD)
+        info_frame = ctk.CTkFrame(self, corner_radius=10, fg_color=BG)
         info_frame.pack(padx=20, pady=10, fill="x")
 
         self.status_label = ctk.CTkLabel(info_frame, text="Status: Idle", font=ctk.CTkFont(size=14, weight="bold"))
