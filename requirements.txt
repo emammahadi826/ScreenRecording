@@ -1,5 +1,6 @@
 customtkinter
-pyautogui
 opencv-python
 numpy
-pyautogui
+mss
+pyaudio
+Pillow
